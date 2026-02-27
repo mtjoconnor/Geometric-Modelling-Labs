@@ -1,26 +1,39 @@
 # Lab 2 Test Commands
 
-# 1) Build (requires SvLis headers/libs installed)
+# 1) (Optional) If SvLis is checked out inside Lab 2, build its static library first
 cd "Lab 2"
-make CSGmug
-# Expected on configured lab/SvLis machine:
-# - Build succeeds and produces ./CSGmug
-#
-# Expected in current environment (captured):
-# - Fails with: fatal error: 'svlis.h' file not found
+if [ -f "SvLis/Makefile" ]; then
+  make -C "SvLis" library
+fi
+# Expected when SvLis folder exists:
+# - Builds/refreshes SvLis/lib/libsvlis.a
 
-# 2) Run interactive preview (if build succeeded and display available)
+# 2) Build the mug program
+# Option A: local SvLis checkout in Lab 2/SvLis
+make CSGmug
+# Option B: external SvLis checkout
+# make CSGmug SVLIS_DIR="$HOME/SvLis"
+# Expected:
+# - Build succeeds and produces ./CSGmug
+
+# 3) Run interactive preview (requires display/GUI session)
 ./CSGmug
 # Expected:
 # - Writes mug.mod
 # - Opens interactive plot window when plot=true
 
-# 3) Artifact check
+# 4) Artifact check
 ls -l mug.mod
 # Expected:
 # - mug.mod exists and is non-empty after successful run
 
-# 4) Expected-failure environment test
-test -f /usr/include/svlis/svlis.h && echo "SvLis headers found" || echo "SvLis headers missing"
-# Expected in current environment:
-# - "SvLis headers missing"
+# 5) Verify SvLis archive exists (path depends on your setup)
+ls -l "SvLis/lib/libsvlis.a" 2>/dev/null || ls -l "$HOME/SvLis/lib/libsvlis.a"
+# Expected:
+# - libsvlis.a exists and is non-empty in one of those locations
+
+# 6) Full rebuild from clean state
+make cleanest
+make CSGmug
+# Expected:
+# - Rebuild succeeds

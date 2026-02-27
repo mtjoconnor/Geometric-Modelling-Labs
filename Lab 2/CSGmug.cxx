@@ -27,28 +27,43 @@ static void my_reporter(sv_real progress)
 
 sv_set buildmymodel(sv_point lowCorner, sv_point highCorner) 
 {
-    // Model centered in the standard [0,10]^3 practical box.
-    const sv_point centre(5.0, 5.0, 5.0);
+    // Center mug in the practical box.
+    const sv_point centre = (lowCorner + highCorner)/2.0;
+    const sv_line z_axis = sv_line(sv_point(0.0, 0.0, 1.0), centre);
 
-    // Mug body: finite cylindrical shell with a non-zero base thickness.
-    sv_line z_axis = sv_line(sv_point(0.0, 0.0, 1.0), centre);
-    sv_set outer_cyl = cylinder(z_axis, 3.0);
-    sv_set inner_cyl = cylinder(z_axis, 2.2);
+    // Main body + cavity (straight mug profile).
+    sv_set outer_body = cylinder(z_axis, 2.60) & cuboid(sv_point(2.2, 2.2, 1.9), sv_point(7.8, 7.8, 8.2));
+    sv_set inner_body = cylinder(z_axis, 2.15) & cuboid(sv_point(2.4, 2.4, 2.6), sv_point(7.6, 7.6, 8.05));
+    sv_set shell = outer_body - inner_body;
 
-    sv_set body_height = cuboid(sv_point(1.6, 1.6, 2.0), sv_point(8.4, 8.4, 8.4));
-    sv_set cavity_height = cuboid(sv_point(1.8, 1.8, 3.0), sv_point(8.2, 8.2, 8.4));
+    // White ceramic lip near the top.
+    sv_set lip_outer = cylinder(z_axis, 2.72) & cuboid(sv_point(2.1, 2.1, 7.85), sv_point(7.9, 7.9, 8.32));
+    sv_set lip_inner = cylinder(z_axis, 2.22) & cuboid(sv_point(2.3, 2.3, 7.85), sv_point(7.7, 7.7, 8.32));
+    sv_set lip = lip_outer - lip_inner;
 
-    sv_set mug_shell = (outer_cyl & body_height) - (inner_cyl & cavity_height);
-    mug_shell = mug_shell.colour(SV_WHEAT);
+    // Thin decorative band below the lip.
+    sv_set band_outer = cylinder(z_axis, 2.68) & cuboid(sv_point(2.1, 2.1, 7.15), sv_point(7.9, 7.9, 7.34));
+    sv_set band_inner = cylinder(z_axis, 2.48) & cuboid(sv_point(2.25, 2.25, 7.15), sv_point(7.75, 7.75, 7.34));
+    sv_set band = band_outer - band_inner;
 
-    // Handle: torus segment overlapping the shell (avoid just-touching geometry).
-    sv_line handle_axis = sv_line(sv_point(1.0, 0.0, 0.0), sv_point(8.1, 5.0, 5.2));
-    sv_set handle_torus = torus(handle_axis, 2.1, 0.55);
-    sv_set handle_clip = cuboid(sv_point(6.6, 2.1, 2.2), sv_point(10.0, 7.9, 8.0));
-    sv_set handle = (handle_torus & handle_clip).colour(SV_BROWN);
+    // Side handle in the correct orientation (vertical loop on mug side).
+    sv_line handle_axis = sv_line(sv_point(0.0, 1.0, 0.0), sv_point(8.10, 5.0, 5.05));
+    sv_set handle_loop = torus(handle_axis, 1.55, 0.36);
+    sv_set handle_clip = cuboid(sv_point(7.0, 4.45, 2.95), sv_point(10.2, 5.55, 7.15));
+    sv_set handle = handle_loop & handle_clip;
 
-    sv_set result = (mug_shell | handle).colour(SV_WHEAT);
-    return result;
+    // Blend handle joints into the body.
+    sv_set joint_top = sphere(sv_point(7.48, 5.0, 6.45), 0.33);
+    sv_set joint_bot = sphere(sv_point(7.48, 5.0, 3.65), 0.33);
+    handle = handle | joint_top | joint_bot;
+
+    // Apply reference-like colors.
+    sv_set red_body = shell.colour(SV_RED);
+    sv_set white_lip = lip.colour(SV_WHITE);
+    sv_set gold_band = band.colour(SV_GOLD);
+    sv_set red_handle = handle.colour(SV_FIREBRICK);
+
+    return red_body | white_lip | gold_band | red_handle;
 }
 
 
@@ -94,6 +109,7 @@ int main(int argc, char **argv)
 
     if (plot)    {
       // Display on the graphics screen
+      set_user_grad_fac(0.20); // Smaller value => smoother curved surfaces.
       m = m.facet();
       plot_m_p_gons(m);
       // Keep the picture up until user says

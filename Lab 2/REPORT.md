@@ -10,11 +10,15 @@
 
 - File changed: `CSGmug.cxx`.
 - Mug geometry:
-  - **Body**: finite cylindrical shell from `cylinder` intersected with a height-limiting cuboid.
-  - **Cavity**: inner cylinder intersected with a slightly higher cuboid, subtracted to leave base thickness.
-  - **Handle**: clipped `torus` segment overlapping the shell to avoid infinitely-thin touching.
-  - **Final model**: `mug_shell | handle`.
-- Colors are applied for visual separation in interactive rendering.
+  - **Body shell**: outer cylinder minus inner cylinder, both clipped by cuboids for wall/base thickness.
+  - **Lip ring**: a white ring near the rim for a ceramic edge.
+  - **Decorative band**: thin gold ring below the lip.
+  - **Handle**: side-oriented torus loop (vertical mug-handle orientation), clipped and blended with small joint spheres.
+  - **Final model**: union of body, lip, band, and handle.
+- Rendering quality:
+  - `set_user_grad_fac(0.20)` is used before faceting to make curved surfaces smoother.
+- Colors are used to match the target style:
+  - red body/handle, white lip, gold band.
 
 ## Written Answers (Boolean Operator Semantics)
 
@@ -30,10 +34,26 @@ Given sets `A` and `B`:
 
 ## Validation Summary
 
-- `make CSGmug`: **fails in this environment** because SvLis headers are not installed:
-  - `fatal error: 'svlis.h' file not found`
-- Code remains build-compatible with the provided Makefile for a correctly configured SvLis setup (e.g. lab machines or local SvLis install).
+- `make CSGmug`: succeeds when SvLis headers/libs are available either:
+  - in `Lab 2/SvLis`, or
+  - in an external path provided via `SVLIS_DIR=/path/to/SvLis`.
+- On macOS the `Makefile` links with:
+  - `-framework GLUT -framework OpenGL`
+- Build output produced:
+  - `./CSGmug`
+- Runtime behavior:
+  - Running `./CSGmug` should generate `mug.mod` and open the interactive plot window when `plot=true`.
 
 ## Notes For Reproducibility
 
-- Practical validation requires an environment with SvLis development headers/libraries available on include/library paths used by `Makefile`.
+1. Make sure SvLis is available:
+   - local checkout at `Lab 2/SvLis`, or
+   - external checkout path passed as `SVLIS_DIR=...`.
+2. Build from `Lab 2`:
+   - `make CSGmug`
+3. Run:
+   - `./CSGmug`
+- Expected artifacts:
+  - `libsvlis.a` (inside chosen SvLis directory)
+  - `CSGmug`
+  - `mug.mod` (after running)
