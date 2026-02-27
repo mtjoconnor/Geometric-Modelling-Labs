@@ -1,0 +1,47 @@
+# Lab 3 Test Commands
+
+# 1) Build
+cd "Lab 3"
+javac *.java
+# Expected: command succeeds with no compilation errors.
+
+# 2) Single elevation from provided sample control polygon
+java BezierCliTest sample.data 1
+# Expected (key lines):
+# Degree elevated to 8
+# ELEVATED_NPOINTS=9
+# FIRST=50,100
+# LAST=450,400
+
+# 3) Repeated elevations
+java BezierCliTest sample.data 5
+# Expected (key lines):
+# Degree elevated to 12
+# ELEVATED_NPOINTS=13
+# FIRST=50,100
+# LAST=450,400
+
+# 4) Smoothing run with preset larger count
+java BezierCliTest sample.data 12
+# Expected (key lines):
+# Degree elevated to 19
+# ELEVATED_NPOINTS=20
+# FIRST=50,100
+# LAST=450,400
+
+# 5) Zero-elevation edge case
+java BezierCliTest sample.data 0
+# Expected:
+# ELEVATED_NPOINTS=0
+
+# 6) Negative / expected-failure test: missing args
+java BezierCliTest
+# Expected:
+# Usage: java BezierCliTest <data-file> <elevations>
+# Exit status: non-zero (1)
+
+# 7) Negative / expected-failure test: invalid argument
+java BezierCliTest sample.data -1
+# Expected:
+# elevations must be non-negative
+# Exit status: non-zero (2)

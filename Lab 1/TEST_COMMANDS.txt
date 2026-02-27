@@ -1,0 +1,38 @@
+# Lab 1 Test Commands
+
+# 1) Build
+cd "Lab 1"
+javac *.java
+# Expected: command succeeds with no compilation errors.
+
+# 2) Required positive test using provided sample input
+java HullCliTest sample.data
+# Expected (key lines):
+# HULL_NPOINTS=5
+# HULL_POINT_0=80,200
+# HULL_POINT_1=120,280
+# HULL_POINT_2=240,380
+# HULL_POINT_3=400,320
+# HULL_POINT_4=180,120
+
+# 3) Optional robustness test: duplicates + collinear edges (provided box.data)
+java HullCliTest box.data
+# Expected (key lines):
+# HULL_NPOINTS=4
+# HULL_POINT_0=300,100
+# HULL_POINT_1=300,450
+# HULL_POINT_2=400,450
+# HULL_POINT_3=400,100
+
+# 4) Optional robustness test: fully collinear data
+java HullCliTest box.data.2
+# Expected (key lines):
+# HULL_NPOINTS=2
+# HULL_POINT_0=300,100
+# HULL_POINT_1=300,450
+
+# 5) Negative / expected-failure test (missing args)
+java HullCliTest
+# Expected:
+# Usage: java HullCliTest <data-file>
+# Exit status: non-zero (1)

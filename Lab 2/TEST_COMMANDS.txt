@@ -1,0 +1,26 @@
+# Lab 2 Test Commands
+
+# 1) Build (requires SvLis headers/libs installed)
+cd "Lab 2"
+make CSGmug
+# Expected on configured lab/SvLis machine:
+# - Build succeeds and produces ./CSGmug
+#
+# Expected in current environment (captured):
+# - Fails with: fatal error: 'svlis.h' file not found
+
+# 2) Run interactive preview (if build succeeded and display available)
+./CSGmug
+# Expected:
+# - Writes mug.mod
+# - Opens interactive plot window when plot=true
+
+# 3) Artifact check
+ls -l mug.mod
+# Expected:
+# - mug.mod exists and is non-empty after successful run
+
+# 4) Expected-failure environment test
+test -f /usr/include/svlis/svlis.h && echo "SvLis headers found" || echo "SvLis headers missing"
+# Expected in current environment:
+# - "SvLis headers missing"
